@@ -1,4 +1,5 @@
 import { defineComponent, ref } from 'vue/dist/vue.esm-bundler.js'
+
 import { getWeatherData, WeatherConditionIcons } from './weather.service.ts'
 
 export default defineComponent({
