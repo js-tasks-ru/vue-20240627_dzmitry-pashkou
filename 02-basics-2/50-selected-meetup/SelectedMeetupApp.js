@@ -1,59 +1,71 @@
 import { computed, defineComponent, onMounted, ref } from 'vue'
 import { getMeetup } from './meetupsService.ts'
 
-const inCart = (state, getters) => id => (getters.index(id) ? -1 : '')
-
 export default defineComponent({
   name: 'SelectedMeetupApp',
 
   setup() {
-    const meetup = ref([])
-    const currentSlide = ref(1)
+    const pages = [1, 2, 3, 4, 5]
+    const currentPage = ref(1)
+    const meetups = ref(null)
 
-    const resultSlide = computed(() => {
-      return currentSlide
+    const newPage = computed(() => {
+      newMeetup(currentPage.value)
+      return currentPage
     })
+
+    const newMeetup = async id => {
+      meetups.value = await getMeetup(id)
+    }
 
     onMounted(async () => {
       try {
-        for (let i = 1; i <= 5; i++) meetup.value.push(await getMeetup(i))
+        meetups.value = await getMeetup(1)
       } catch (error) {
         console.error(error)
       }
     })
 
     return {
-      meetup,
-      currentSlide,
-      resultSlide,
+      pages,
+      meetups,
+      currentPage,
+      newPage,
+      newMeetup,
     }
   },
 
   template: `
     <div class="meetup-selector">
+    <template v-if="meetups">
+    </template>
+
       <div class="meetup-selector__control">
-        <button @click="currentSlide--" class="button button--secondary" type="button" :disabled="currentSlide <= 1">Предыдущий</button>
-        <div class="radio-group" role="radiogroup">
-          <div v-for="page of meetup" class="radio-group__button">
+        <button @click="currentPage--" class="button button--secondary" type="button" :disabled="currentPage <= 1">Предыдущий</button>
+        <div v-for="page in pages" class="radio-group" role="radiogroup">
+          <div class="radio-group__button">
             <input
-              :id="'meetup-id-' + page.id"
+              :id="'meetup-id-' + page"
               class="radio-group__input"
               type="radio"
-              name="meetupId"
-              :value="page.id"
-              v-model="currentSlide"
+              name="meetup-radio"
+              :value="page"
+              v-model="currentPage"
             />
-            <label :for="'meetup-id-' + page.id" class="radio-group__label">{{ page.id }}</label>
+            <label :for="'meetup-id-' + page" class="radio-group__label">{{ page }}</label>
           </div>
         </div>
 
-        <button @click="currentSlide++" :disabled="currentSlide >= meetup.length" class="button button--secondary" type="button">Следующий</button>
+        <button @click="currentPage++" class="button button--secondary" type="button" :disabled="currentPage >= pages.length">Следующий</button>
       </div>
-      <div v-for="(slide, index) of meetup" v-show="index === currentSlide - 1" class="meetup-selector__cover">
-        <div class="meetup-cover">
-          <h1 class="meetup-cover__title">{{ slide.title }}</h1>
+
+      <template v-if="meetups">
+        <div class="meetup-selector__cover">
+          <div class="meetup-cover">
+            <h1 class="meetup-cover__title">{{ meetups.title }}</h1>
+          </div>
         </div>
-      </div>
+      </template>
 
     </div>
   `,
