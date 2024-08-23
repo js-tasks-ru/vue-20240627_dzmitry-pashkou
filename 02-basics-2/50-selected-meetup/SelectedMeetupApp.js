@@ -11,7 +11,7 @@ export default defineComponent({
 
     const newPage = computed(() => {
       newMeetup(currentPage.value)
-      return currentPage
+      return currentPage.value
     })
 
     const newMeetup = async id => {
@@ -37,11 +37,9 @@ export default defineComponent({
 
   template: `
     <div class="meetup-selector">
-    <template v-if="meetups">
-    </template>
-
       <div class="meetup-selector__control">
-        <button @click="currentPage--" class="button button--secondary" type="button" :disabled="currentPage <= 1">Предыдущий</button>
+        <button @click="currentPage--" class="button button--secondary" type="button" :disabled="newPage <= 1">Предыдущий</button>
+        <template v-if='newPage'>
         <div v-for="page in pages" class="radio-group" role="radiogroup">
           <div class="radio-group__button">
             <input
@@ -55,8 +53,10 @@ export default defineComponent({
             <label :for="'meetup-id-' + page" class="radio-group__label">{{ page }}</label>
           </div>
         </div>
+        </template>
 
-        <button @click="currentPage++" class="button button--secondary" type="button" :disabled="currentPage >= pages.length">Следующий</button>
+
+        <button @click="currentPage++" class="button button--secondary" type="button" :disabled="newPage >= pages.length">Следующий</button>
       </div>
 
       <template v-if="meetups">
