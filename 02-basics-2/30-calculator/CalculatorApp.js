@@ -1,26 +1,51 @@
-import { defineComponent } from 'vue'
+import { computed, defineComponent, ref, watch } from 'vue'
 
 export default defineComponent({
   name: 'CalculatorApp',
 
-  setup() {},
+  setup() {
+    const num1 = ref(10)
+    const num2 = ref(2)
+    const MathOperator = ref('sum')
+    const result = computed(() => {
+      if (MathOperator.value === 'sum') {
+        return num1.value + num2.value
+      }
+      if (MathOperator.value === 'subtract') {
+        return num1.value - num2.value
+      }
+      if (MathOperator.value === 'multiply') {
+        return num1.value * num2.value
+      }
+      if (MathOperator.value === 'divide') {
+        return num1.value / num2.value
+      }
+    })
+
+    return {
+      MathOperator,
+      num1,
+      num2,
+      result,
+    }
+  },
 
   template: `
     <div class="calculator">
-      <input type="number" aria-label="First operand" />
+      <input v-model="num1" type="number" aria-label="First operand"/>
 
       <div class="calculator__operators">
-        <label><input type="radio" name="operator" value="sum"/>➕</label>
-        <label><input type="radio" name="operator" value="subtract"/>➖</label>
-        <label><input type="radio" name="operator" value="multiply"/>✖</label>
-        <label><input type="radio" name="operator" value="divide"/>➗</label>
+        <label><input type="radio" name="operator" value="sum" v-model="MathOperator"/>➕</label>
+        <label><input type="radio" name="operator" value="subtract" v-model="MathOperator"/>➖</label>
+        <label><input type="radio" name="operator" value="multiply" v-model="MathOperator"/>✖</label>
+        <label><input type="radio" name="operator" value="divide" v-model="MathOperator"/>➗</label>
       </div>
 
-      <input type="number" aria-label="Second operand" />
+      <input v-model="num2" type="number" aria-label="Second operand"/>
 
       <div>=</div>
 
-      <output>0</output>
+      <output>{{result}}</output>
     </div>
   `,
 })
